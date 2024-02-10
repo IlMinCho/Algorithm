@@ -19,25 +19,49 @@
 # 출력
 # 프로그램의 출력은 표준 출력으로 한다. q줄에 대하여 해당 질의에 대한 답을 한다. 각각은 개행으로 구분하며, 질의가 맞다면 ‘yes’를, 질의가 틀리면 ‘no’를 출력한다. 
 n = int(input())  # 트리의 정점 개수
-edges = [tuple(map(int, input().split())) for _ in range(n - 1)]  # 간선 정보
+graph = [[] for _ in range(n + 1)]
 
-# 질의 개수
+# 그래프 구성
+for _ in range(n - 1):
+    a, b = map(int, input().split())
+    graph[a].append(b)
+    graph[b].append(a)
+
+order = 0  # 노드 방문 순서
+orders = [-1] * (n + 1)  # 각 노드의 방문 순서
+low = [-1] * (n + 1)  # 각 노드에서 도달할 수 있는 가장 낮은 순서
+is_cut_vertex = [False] * (n + 1)  # 단절점 여부
+
+def dfs(node, parent):
+    global order
+    order += 1
+    orders[node] = low[node] = order
+    child_count = 0  # 루트 노드의 자식 수
+
+    for next_node in graph[node]:
+        if next_node == parent:
+            continue
+        if orders[next_node] == -1:  # 아직 방문하지 않은 노드
+            child_count += 1
+            dfs(next_node, node)
+            low[node] = min(low[node], low[next_node])
+            # 루트가 아닌 노드에서 조건을 만족하면 단절점
+            if parent != 0 and low[next_node] >= orders[node]:
+                is_cut_vertex[node] = True
+        else:
+            low[node] = min(low[node], orders[next_node])
+
+    # 루트 노드인 경우
+    if parent == 0 and child_count >= 2:
+        is_cut_vertex[node] = True
+
+dfs(1, 0)  # 1번 노드를 루트로 가정
+
+# 질의 처리
 q = int(input())
-queries = [tuple(map(int, input().split())) for _ in range(q)]  # 질의 정보
-
-# 트리에서 모든 간선은 단절선이다.
-# 단절점 여부를 판단하기 위해 각 정점의 자식 수를 계산한다.
-children_count = [0] * (n + 1)
-for a, b in edges:
-    children_count[a] += 1
-    children_count[b] += 1
-
-for t, k in queries:
+for _ in range(q):
+    t, k = map(int, input().split())
     if t == 1:  # 단절점 질의
-        # 루트가 아닌 정점이고 자식이 2개 이상이면 단절점이다.
-        # 트리에서는 루트 노드를 제외한 모든 내부 노드가 단절점이 될 수 있다.
-        # 여기서는 간단히 처리하기 위해 자식이 1개 이상인지만 확인한다.
-        print('yes' if children_count[k] > 1 else 'no')
+        print('yes' if is_cut_vertex[k] else 'no')
     elif t == 2:  # 단절선 질의
-        # 트리에서 모든 간선은 단절선이다.
-        print('yes')
+        print('yes')  # 트리에서 모든 간선은 단절
