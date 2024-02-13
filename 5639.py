@@ -19,13 +19,11 @@
 # 출력
 # 입력으로 주어진 이진 검색 트리를 후위 순회한 결과를 한 줄에 하나씩 출력한다.
 
+import sys
 
-외부 입력을 받아 처리하는 프로그램을 만들기 위해서는 사용자로부터 입력을 받는 방법을 포함해야 합니다. Python에서는 input() 함수를 사용하여 사용자의 입력을 받을 수 있습니다. 그러나 이 환경에서는 실시간 사용자 입력을 받는 것이 불가능합니다. 대신, 외부 입력을 받는 코드 예제를 제공할 수 있으며, 이 코드는 로컬 환경이나 다른 Python 실행 환경에서 실행해 볼 수 있습니다.
+# 재귀 깊이 제한 늘리기
+sys.setrecursionlimit(10000)
 
-아래는 외부에서 전위 순회 결과를 입력으로 받아 이진 검색 트리를 후위 순회로 출력하는 전체 Python 프로그램의 예제입니다. 이 코드는 표준 입력으로부터 여러 줄에 걸쳐 전위 순회 결과를 받아들이고, 입력이 끝나면 후위 순회 결과를 출력합니다. 입력 종료는 파일 끝(EOF)으로 표시됩니다. Linux나 macOS에서는 Ctrl+D를, Windows에서는 Ctrl+Z를 사용하여 EOF를 입력할 수 있습니다.
-
-python
-Copy code
 class Node:
     def __init__(self, data):
         self.left = None
@@ -42,10 +40,11 @@ def insert(root, data):
             root.right = insert(root.right, data)
     return root
 
-def postOrderTraversal(root, result=[]):
+def postOrderTraversal(root):
+    result = []
     if root:
-        postOrderTraversal(root.left, result)
-        postOrderTraversal(root.right, result)
+        result.extend(postOrderTraversal(root.left))
+        result.extend(postOrderTraversal(root.right))
         result.append(root.data)
     return result
 
@@ -59,7 +58,7 @@ def main():
         pass  # 입력 종료
 
     # 후위 순회 결과 출력
-    postOrderResult = postOrderTraversal(root, [])
+    postOrderResult = postOrderTraversal(root)
     for data in postOrderResult:
         print(data)
 
