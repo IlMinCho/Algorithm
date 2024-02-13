@@ -19,48 +19,126 @@
 # 출력
 # 입력으로 주어진 이진 검색 트리를 후위 순회한 결과를 한 줄에 하나씩 출력한다.
 
+# import sys
+
+# # 재귀 깊이 제한 늘리기
+# sys.setrecursionlimit(10000)
+
+# class Node:
+#     def __init__(self, data):
+#         self.left = None
+#         self.right = None
+#         self.data = data
+
+# def insert(root, data):
+#     if root is None:
+#         return Node(data)
+#     else:
+#         if data < root.data:
+#             root.left = insert(root.left, data)
+#         else:
+#             root.right = insert(root.right, data)
+#     return root
+
+# def postOrderTraversal(root):
+#     result = []
+#     if root:
+#         result.extend(postOrderTraversal(root.left))
+#         result.extend(postOrderTraversal(root.right))
+#         result.append(root.data)
+#     return result
+
+# def main():
+#     root = None
+#     try:
+#         while True:
+#             data = int(input())  # 전위 순회 결과로부터 노드 값 하나씩 입력 받음
+#             root = insert(root, data)
+#     except EOFError:
+#         pass  # 입력 종료
+
+#     # 후위 순회 결과 출력
+#     postOrderResult = postOrderTraversal(root)
+#     for data in postOrderResult:
+#         print(data)
+
+# if __name__ == "__main__":
+#     main()
+
+
+# import sys
+
+# class Node:
+#     def __init__(self, data):
+#         self.data = data
+#         self.left = None
+#         self.right = None
+
+# def buildTree(preorder, start, end):
+#     if start > end:
+#         return None
+
+#     node = Node(preorder[start])
+#     i = start + 1
+
+#     while i <= end and preorder[i] < node.data:
+#         i += 1
+
+#     node.left = buildTree(preorder, start + 1, i - 1)
+#     node.right = buildTree(preorder, i, end)
+
+#     return node
+
+# def postOrderTraversal(node):
+#     if node:
+#         postOrderTraversal(node.left)
+#         postOrderTraversal(node.right)
+#         print(node.data)
+
+# def main():
+#     preorder_input = []
+#     for line in sys.stdin:
+#         if line.strip():
+#             preorder_input.append(int(line.strip()))
+
+#     root = buildTree(preorder_input, 0, len(preorder_input) - 1)
+#     postOrderTraversal(root)
+
+# if __name__ == "__main__":
+#     main()
+
+
 import sys
 
-# 재귀 깊이 제한 늘리기
+# 재귀 깊이 한계를 증가시킵니다. 예를 들어 10,000으로 설정.
 sys.setrecursionlimit(10000)
 
-class Node:
-    def __init__(self, data):
-        self.left = None
-        self.right = None
-        self.data = data
-
-def insert(root, data):
-    if root is None:
-        return Node(data)
-    else:
-        if data < root.data:
-            root.left = insert(root.left, data)
-        else:
-            root.right = insert(root.right, data)
-    return root
-
-def postOrderTraversal(root):
-    result = []
-    if root:
-        result.extend(postOrderTraversal(root.left))
-        result.extend(postOrderTraversal(root.right))
-        result.append(root.data)
-    return result
+def postOrder(start, end, preorder):
+    if start > end:
+        return
+    
+    # 전위 순회 결과에서 루트 노드보다 큰 값을 찾아서
+    # 왼쪽과 오른쪽 서브트리로 나눕니다.
+    root = preorder[start]
+    div = end + 1  # 분할 지점 초기화
+    for i in range(start + 1, end + 1):
+        if preorder[i] > root:
+            div = i
+            break
+    
+    # 왼쪽 서브트리 후위 순회
+    postOrder(start + 1, div - 1, preorder)
+    # 오른쪽 서브트리 후위 순회
+    postOrder(div, end, preorder)
+    # 루트 노드 방문
+    print(root)
 
 def main():
-    root = None
-    try:
-        while True:
-            data = int(input())  # 전위 순회 결과로부터 노드 값 하나씩 입력 받음
-            root = insert(root, data)
-    except EOFError:
-        pass  # 입력 종료
+    preorder = []
+    for line in sys.stdin:
+        preorder.append(int(line.strip()))
 
-    # 후위 순회 결과 출력
-    postOrderResult = postOrderTraversal(root)
-    for data in postOrderResult:
-        print(data)
+    postOrder(0, len(preorder) - 1, preorder)
 
 if __name__ == "__main__":
     main()
