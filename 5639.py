@@ -66,79 +66,81 @@
 #     main()
 
 
-# import sys
-
-# class Node:
-#     def __init__(self, data):
-#         self.data = data
-#         self.left = None
-#         self.right = None
-
-# def buildTree(preorder, start, end):
-#     if start > end:
-#         return None
-
-#     node = Node(preorder[start])
-#     i = start + 1
-
-#     while i <= end and preorder[i] < node.data:
-#         i += 1
-
-#     node.left = buildTree(preorder, start + 1, i - 1)
-#     node.right = buildTree(preorder, i, end)
-
-#     return node
-
-# def postOrderTraversal(node):
-#     if node:
-#         postOrderTraversal(node.left)
-#         postOrderTraversal(node.right)
-#         print(node.data)
-
-# def main():
-#     preorder_input = []
-#     for line in sys.stdin:
-#         if line.strip():
-#             preorder_input.append(int(line.strip()))
-
-#     root = buildTree(preorder_input, 0, len(preorder_input) - 1)
-#     postOrderTraversal(root)
-
-# if __name__ == "__main__":
-#     main()
-
-
 import sys
 
-# 재귀 깊이 한계를 증가시킵니다. 예를 들어 10,000으로 설정.
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
-def postOrder(start, end, preorder):
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.left = None
+        self.right = None
+
+def buildTree(preorder, start, end):
     if start > end:
-        return
-    
-    # 전위 순회 결과에서 루트 노드보다 큰 값을 찾아서
-    # 왼쪽과 오른쪽 서브트리로 나눕니다.
-    root = preorder[start]
-    div = end + 1  # 분할 지점 초기화
-    for i in range(start + 1, end + 1):
-        if preorder[i] > root:
-            div = i
-            break
-    
-    # 왼쪽 서브트리 후위 순회
-    postOrder(start + 1, div - 1, preorder)
-    # 오른쪽 서브트리 후위 순회
-    postOrder(div, end, preorder)
-    # 루트 노드 방문
-    print(root)
+        return None
+
+    node = Node(preorder[start])
+    i = start + 1
+
+    while i <= end and preorder[i] < node.data:
+        i += 1
+
+    node.left = buildTree(preorder, start + 1, i - 1)
+    node.right = buildTree(preorder, i, end)
+
+    return node
+
+def postOrderTraversal(node):
+    if node:
+        postOrderTraversal(node.left)
+        postOrderTraversal(node.right)
+        print(node.data)
 
 def main():
-    preorder = []
+    preorder_input = []
     for line in sys.stdin:
-        preorder.append(int(line.strip()))
+        if line.strip():
+            preorder_input.append(int(line.strip()))
 
-    postOrder(0, len(preorder) - 1, preorder)
+    root = buildTree(preorder_input, 0, len(preorder_input) - 1)
+    postOrderTraversal(root)
 
 if __name__ == "__main__":
     main()
+
+
+# import sys
+
+# # 재귀 깊이 한계를 증가시킵니다. 예를 들어 10,000으로 설정.
+# sys.setrecursionlimit(10000)
+
+# def postOrder(start, end, preorder):
+#     if start > end:
+#         return
+    
+#     # 전위 순회 결과에서 루트 노드보다 큰 값을 찾아서
+#     # 왼쪽과 오른쪽 서브트리로 나눕니다.
+#     root = preorder[start]
+#     div = end + 1  # 분할 지점 초기화
+#     for i in range(start + 1, end + 1):
+#         if preorder[i] > root:
+#             div = i
+#             break
+    
+#     # 왼쪽 서브트리 후위 순회
+#     postOrder(start + 1, div - 1, preorder)
+#     # 오른쪽 서브트리 후위 순회
+#     postOrder(div, end, preorder)
+#     # 루트 노드 방문
+#     print(root)
+
+# def main():
+#     preorder = []
+#     for line in sys.stdin:
+#         preorder.append(int(line.strip()))
+
+#     postOrder(0, len(preorder) - 1, preorder)
+
+# if __name__ == "__main__":
+#     main()
