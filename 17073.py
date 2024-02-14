@@ -30,37 +30,80 @@
 # 출력
 # 문제의 정답을 출력한다. 정답과의 차이가 10-3 이하인 값은 모두 정답으로 인정된다.
 
-from collections import defaultdict
+# from collections import defaultdict
 
-def calculate_expected_water_distribution(n, w, edges):
-    graph = defaultdict(list)
-    for u, v in edges:
-        graph[u].append(v)
-        graph[v].append(u)
+# def calculate_expected_water_distribution(n, w, edges):
+#     graph = defaultdict(list)
+#     for u, v in edges:
+#         graph[u].append(v)
+#         graph[v].append(u)
 
-    water_distribution = defaultdict(int)
-    water_distribution[1] = w
-    visited = set()
+#     water_distribution = defaultdict(int)
+#     water_distribution[1] = w
+#     visited = set()
 
-    def dfs(node):
-        visited.add(node)
-        num_children = len([child for child in graph[node] if child not in visited])
-        if num_children == 0:
-            return
-        water_per_child = water_distribution[node] / num_children
-        for child in graph[node]:
-            if child not in visited:
-                water_distribution[child] += water_per_child
-                dfs(child)
+#     def dfs(node):
+#         visited.add(node)
+#         num_children = len([child for child in graph[node] if child not in visited])
+#         if num_children == 0:
+#             return
+#         water_per_child = water_distribution[node] / num_children
+#         for child in graph[node]:
+#             if child not in visited:
+#                 water_distribution[child] += water_per_child
+#                 dfs(child)
 
-    dfs(1)
+#     dfs(1)
 
-    leaf_nodes_water = [water_distribution[node] for node in water_distribution if len(graph[node]) == 1 and node != 1]
-    average_water = sum(leaf_nodes_water) / len(leaf_nodes_water)
-    return average_water
+#     leaf_nodes_water = [water_distribution[node] for node in water_distribution if len(graph[node]) == 1 and node != 1]
+#     average_water = sum(leaf_nodes_water) / len(leaf_nodes_water)
+#     return average_water
 
-if __name__ == "__main__":
-    n, w = map(int, input().split())
-    edges = [tuple(map(int, input().split())) for _ in range(n - 1)]
-    average_water_at_leaf_nodes = calculate_expected_water_distribution(n, w, edges)
-    print(f"{average_water_at_leaf_nodes:.10f}")
+# if __name__ == "__main__":
+#     n, w = map(int, input().split())
+#     edges = [tuple(map(int, input().split())) for _ in range(n - 1)]
+#     average_water_at_leaf_nodes = calculate_expected_water_distribution(n, w, edges)
+#     print(f"{average_water_at_leaf_nodes:.10f}")
+
+
+import sys
+from collections import deque
+
+# 입력 속도 개선을 위해 sys.stdin.readline 사용
+input = lambda: sys.stdin.readline().rstrip()
+
+def bfs_water_distribution():
+    N, W = map(int, input().split())  # 노드 수와 루트 노드의 물의 양 입력 받기
+    t = [[] for _ in range(N+1)]  # 각 노드별 연결된 노드 정보 저장
+    v = [0] * (N+1)  # 각 노드별 물의 양 저장, 초기에는 모두 0
+    v[1] = W  # 루트 노드에 초기 물의 양 설정
+
+    # 간선 정보 입력 받기
+    for _ in range(N-1):
+        a, b = map(int, input().split())
+        t[a].append(b)
+        t[b].append(a)
+
+    visited = set([1])  # 방문한 노드 집합
+    queue = deque([1])  # BFS 탐색을 위한 큐, 루트 노드부터 시작
+
+    while queue:
+        node = queue.popleft()
+        count = len([x for x in t[node] if x not in visited])  # 현재 노드에서 이동 가능한 자식 노드 수
+
+        if count > 0:
+            each_value = v[node] / count
+            for nx in t[node]:
+                if nx not in visited:
+                    v[nx] = each_value  # 자식 노드에 물 분배
+                    visited.add(nx)
+                    queue.append(nx)
+            v[node] = 0  # 자식에게 물을 나누어준 경우, 현재 노드의 물을 0으로 설정
+
+    # 물의 양이 0이 아닌 노드들의 평균 물의 양 계산
+    non_zero_values = [value for value in v if value > 0]
+    average = sum(non_zero_values) / len(non_zero_values) if non_zero_values else 0
+
+    return average
+
+print(f"{bfs_water_distribution():.10f}")
