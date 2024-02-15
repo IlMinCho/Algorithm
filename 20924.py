@@ -71,46 +71,79 @@
 # 나무의 기둥의 길이와 가장 긴 가지의 길이를 출력한다.
 
 
+# from sys import stdin, setrecursionlimit
+# from collections import defaultdict
+# setrecursionlimit(10**9)
+
+# def get_maxbranch(tree, root):
+#     if root not in tree : return 0
+
+#     maxbranch = 0
+#     for node, w in tree[root].items():
+#         del tree[node][root]
+#         branch = w + get_maxbranch(tree, node)
+#         if branch > maxbranch :
+#             maxbranch = branch
+#     return maxbranch
+
+# # 변수초기화
+# N, R = map(int, stdin.readline().split())
+# tree = defaultdict(dict)
+# for _ in range(N-1):
+#     a, b, w = map(int, stdin.readline().split())
+#     tree[a][b] = w
+#     tree[b][a] = w
+
+# # 기가노드까지의 기둥 길이 찾기
+# giganode = R
+# gigalen = 0
+# while len(tree[giganode])==1:
+#     node, w = list(tree[giganode].items())[0]
+#     del tree[node][giganode]
+#     gigalen += w
+#     giganode = node
+
+# # 가장 긴 가지 길이 찾기
+# maxbranch = get_maxbranch(tree, giganode)
+
+# print('{} {}'.format(gigalen, maxbranch))
+import sys
 from collections import defaultdict
 
-# 입력 처리
-n, root = map(int, input().split())
-edges = [list(map(int, input().split())) for _ in range(n-1)]
+input = sys.stdin.readline
+sys.setrecursionlimit(10**9)
 
-# 인접 리스트 생성
+n, r = map(int, input().split())
 graph = defaultdict(list)
-for a, b, d in edges:
-    graph[a].append((b, d))
-    graph[b].append((a, d))
 
-# 스택을 사용한 반복적 DFS로 기둥과 가지의 길이 계산
-def iterative_dfs(root, graph):
-    stack = [(root, 0, False)]  # (노드, 현재까지의 길이, 기가 노드 여부)
-    visited = set()
-    pillar_length = 0
-    longest_branch_length = 0
-    giga_node_found = False
+for _ in range(n-1):
+    a, b, c = map(int, input().split())
+    graph[a].append((b, c))
+    graph[b].append((a, c))
 
-    while stack:
-        node, length, is_giga = stack.pop()
-        if node in visited:
+# 결과를 저장할 변수: 기둥의 길이, 가장 긴 가지의 길이
+ans = [0, 0]
+
+def dfs(node, parent, length, flag):
+    global ans
+    # 기가 노드 찾기 전: 기둥 길이 계산
+    if flag == 0:
+        ans[0] = length
+    # 기가 노드 찾은 후: 가장 긴 가지의 길이 계산
+    else:
+        ans[1] = max(ans[1], length)
+    
+    # 기가 노드 판별
+    if flag == 0 and len(graph[node]) > 2 - int(node == r):
+        flag, length = 1, 0  # 기가 노드를 찾았으므로 flag 업데이트, 길이 초기화
+
+    for next_node, weight in graph[node]:
+        if next_node == parent:
             continue
-        visited.add(node)
+        dfs(next_node, node, length + weight, flag)
 
-        if not giga_node_found and (len(graph[node]) > 2 or (node == root and len(graph[node]) > 1)):
-            giga_node_found = True
-            pillar_length = length
-            is_giga = True  # 현재 노드를 기가 노드로 설정
+# DFS 실행
+dfs(r, -1, 0, 0)
 
-        elif len(graph[node]) == 1 and node != root:  # 리프 노드
-            if giga_node_found:  # 기가 노드 이후의 리프 노드
-                longest_branch_length = max(longest_branch_length, length - pillar_length)
-
-        for next_node, dist in graph[node]:
-            if next_node not in visited:
-                stack.append((next_node, length + dist, is_giga))
-
-    return pillar_length, longest_branch_length
-
-pillar_length, longest_branch_length = iterative_dfs(root, graph)
-print(pillar_length, longest_branch_length)
+# 결과 출력
+print(ans[0], ans[1])
