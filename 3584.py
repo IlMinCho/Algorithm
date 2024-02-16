@@ -23,56 +23,96 @@
 
 # 출력
 # 각 테스트 케이스 별로, 첫 줄에 입력에서 주어진 두 노드의 가장 가까운 공통 조상을 출력합니다.
+# import sys
 
-def dfs(tree, node, parent, depth, up):
-    depth[node] = depth[parent] + 1
-    up[node][0] = parent
-    for i in range(1, len(up[node])):
-        up[node][i] = up[up[node][i-1]][i-1]
+# sys.setrecursionlimit(100000)
 
-    for child in tree[node]:
-        if child != parent:
-            dfs(tree, child, node, depth, up)
+# def dfs(tree, node, parent, depth, up):
+#     depth[node] = depth[parent] + 1
+#     up[node][0] = parent
+#     for i in range(1, len(up[node])):
+#         up[node][i] = up[up[node][i-1]][i-1]
 
-def lca(u, v, depth, up):
-    if depth[u] < depth[v]:
-        u, v = v, u
+#     for child in tree[node]:
+#         if child != parent:
+#             dfs(tree, child, node, depth, up)
 
-    for i in reversed(range(len(up[u]))):
-        if depth[u] - (1 << i) >= depth[v]:
-            u = up[u][i]
+# def lca(u, v, depth, up):
+#     if depth[u] < depth[v]:
+#         u, v = v, u
 
-    if u == v:
-        return u
+#     for i in reversed(range(len(up[u]))):
+#         if depth[u] - (1 << i) >= depth[v]:
+#             u = up[u][i]
 
-    for i in reversed(range(len(up[u]))):
-        if up[u][i] != up[v][i]:
-            u = up[u][i]
-            v = up[v][i]
+#     if u == v:
+#         return u
 
-    return up[u][0]
+#     for i in reversed(range(len(up[u]))):
+#         if up[u][i] != up[v][i]:
+#             u = up[u][i]
+#             v = up[v][i]
 
-def preprocess_and_solve(n, edges, queries):
-    tree = [[] for _ in range(n + 1)]
-    for u, v in edges:
-        tree[u].append(v)
-        tree[v].append(u)
+#     return up[u][0]
 
-    depth = [0] * (n + 1)
-    up = [[0] * n.bit_length() for _ in range(n + 1)]
-    dfs(tree, 1, 0, depth, up)
+# def preprocess_and_solve(n, edges, queries):
+#     tree = [[] for _ in range(n + 1)]
+#     for u, v in edges:
+#         tree[u].append(v)
+#         tree[v].append(u)
 
-    return [lca(u, v, depth, up) for u, v in queries]
+#     depth = [0] * (n + 1)
+#     up = [[0] * n.bit_length() for _ in range(n + 1)]
+#     dfs(tree, 1, 0, depth, up)
+
+#     return [lca(u, v, depth, up) for u, v in queries]
+
+# if __name__ == "__main__":
+#     T = int(input())
+#     for _ in range(T):
+#         N = int(input())
+#         edges = []
+#         for _ in range(N - 1):
+#             u, v = map(int, input().split())
+#             edges.append((u, v))
+#         u, v = map(int, input().split())
+#         queries = [(u, v)]
+#         result = preprocess_and_solve(N, edges, queries)
+#         print(result[0])
+
+def find_parent(parent, x):
+    parents = []
+    while x:
+        parents.append(x)
+        x = parent[x]
+    return parents
 
 if __name__ == "__main__":
     T = int(input())
     for _ in range(T):
         N = int(input())
-        edges = []
+        parent = [0] * (N + 1)  # 각 노드의 부모 노드를 저장하는 리스트, 0번 인덱스는 사용하지 않음
+
+        # 간선 정보 입력받아 부모 노드 설정
         for _ in range(N - 1):
             u, v = map(int, input().split())
-            edges.append((u, v))
-        u, v = map(int, input().split())
-        queries = [(u, v)]
-        result = preprocess_and_solve(N, edges, queries)
-        print(result[0])
+            parent[v] = u
+
+        x, y = map(int, input().split())
+        
+        # 부모 리스트를 거꾸로 탐색하여 깊이가 0인 부모까지 기록
+        x_parents = find_parent(parent, x)
+        y_parents = find_parent(parent, y)
+
+        # 깊이 맞추기
+        i = len(x_parents) - 1
+        j = len(y_parents) - 1
+
+        # 최소 공통 조상 찾기
+        lca = 0
+        while i >= 0 and j >= 0 and x_parents[i] == y_parents[j]:
+            lca = x_parents[i]
+            i -= 1
+            j -= 1
+
+        print(lca)
