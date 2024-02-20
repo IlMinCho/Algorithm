@@ -24,6 +24,95 @@
 
 # 출력
 # 첫째 줄에 너비가 가장 넓은 레벨과 그 레벨의 너비를 순서대로 출력한다. 너비가 가장 넓은 레벨이 두 개 이상 있을 때에는 번호가 작은 레벨을 출력한다.
+# from collections import deque
+
+# class Node:
+#     def __init__(self, number):
+#         self.number = number
+#         self.left = None
+#         self.right = None
+
+# def in_order_traversal(node, order):
+#     if node.left:
+#         in_order_traversal(node.left, order)
+#     order.append(node.number)
+#     if node.right:
+#         in_order_traversal(node.right, order)
+
+# def bfs(root, column_order):
+#     queue = deque([(root, 1)])
+#     level_min_max = {}
+#     while queue:
+#         node, level = queue.popleft()
+#         index = column_order.index(node.number)
+#         if level in level_min_max:
+#             level_min_max[level] = (min(level_min_max[level][0], index), max(level_min_max[level][1], index))
+#         else:
+#             level_min_max[level] = (index, index)
+#         if node.left:
+#             queue.append((node.left, level + 1))
+#         if node.right:
+#             queue.append((node.right, level + 1))
+#     return level_min_max
+
+# n = int(input())  # Number of nodes
+# nodes = {i: Node(i) for i in range(1, n + 1)}
+
+# root = None
+# for _ in range(n):
+#     number, left, right = map(int, input().split())
+#     if left != -1:
+#         nodes[number].left = nodes[left]
+#     if right != -1:
+#         nodes[number].right = nodes[right]
+#     if root is None:
+#         root = nodes[number]
+
+# # Find the actual root
+# for i in range(1, n + 1):
+#     if all(i != child.number for node in nodes.values() for child in [node.left, node.right] if child):
+#         root = nodes[i]
+#         break
+
+# # In-order traversal to get column order
+# column_order = [0]  # Start indexing from 1
+# in_order_traversal(root, column_order)
+# column_order = [0] + column_order  # Adjusting for 1-based indexing
+
+# # BFS to calculate width of each level
+# level_min_max = bfs(root, column_order)
+
+# # Find the level with the maximum width
+# max_width = 0
+# max_level = 0
+# for level, (min_index, max_index) in level_min_max.items():
+#     width = max_index - min_index + 1
+#     if width > max_width:
+#         max_width = width
+#         max_level = level
+
+# print(max_level, max_width)
+
+
+
+
+# 기존 코드의 주된 문제점은 bfs 함수 내에서 column_order.index(node.number)를 사용하여 각 노드의 열 인덱스를 찾는 과정에서 비효율이 발생하는 것이었습니다. 이 작업은 리스트 전체를 매번 순회하며 인덱스를 찾기 때문에, 많은 시간이 소요됩니다. 특히, 노드의 수가 많을 때 이로 인한 시간 초과가 발생할 수 있습니다.
+
+# 개선한 코드에서는 이 문제를 해결하기 위해 다음과 같은 접근 방식을 취했습니다:
+
+# 노드 번호와 열 인덱스의 매핑(dictionary 사용): 중위 순회를 수행하면서 각 노드 번호에 대한 열 인덱스를 사전(dictionary)에 저장합니다. 이렇게 하면 나중에 각 노드에 대한 열 인덱스를 O(1) 시간 복잡도로 즉시 찾을 수 있습니다. 이는 node_to_index[node.number]를 통해 이루어집니다.
+# node_to_index = {}  # 노드 번호와 열 인덱스의 매핑
+# in_order_traversal(root, column_order, node_to_index)
+# 루트 노드 찾기 개선: 모든 노드를 순회하여 루트 노드를 찾는 대신, 루트가 될 수 없는 노드(다른 노드의 자식이 되는 노드)를 기록합니다. 그 후, 전체 노드 집합에서 이 노드들을 제외한 나머지 노드를 루트 노드로 결정합니다. 이는 집합 연산을 통해 효율적으로 수행됩니다.
+# not_root = set()  # 루트가 될 수 없는 노드의 집합
+# for _ in range(n):
+#     number, left, right = map(int, input().split())
+#     # left와 right를 not_root에 추가
+# root_number = (set(nodes.keys()) - not_root).pop()  # 루트 노드 번호 찾기
+# root = nodes[root_number]
+# BFS를 통한 레벨별 최소 및 최대 열 인덱스 계산: BFS를 사용하여 각 노드의 레벨별로 최소 및 최대 열 인덱스를 계산하고, 이를 바탕으로 각 레벨의 너비를 구합니다. node_to_index 매핑을 통해 각 노드의 열 인덱스를 빠르게 찾을 수 있어, 이 과정이 효율적으로 이루어집니다.
+# level_min_max = bfs(root, node_to_index)
+
 from collections import deque
 
 class Node:
@@ -32,19 +121,20 @@ class Node:
         self.left = None
         self.right = None
 
-def in_order_traversal(node, order):
+def in_order_traversal(node, order, node_to_index):
     if node.left:
-        in_order_traversal(node.left, order)
+        in_order_traversal(node.left, order, node_to_index)
     order.append(node.number)
+    node_to_index[node.number] = len(order)  # 현재 노드의 인덱스를 저장
     if node.right:
-        in_order_traversal(node.right, order)
+        in_order_traversal(node.right, order, node_to_index)
 
-def bfs(root, column_order):
+def bfs(root, node_to_index):
     queue = deque([(root, 1)])
     level_min_max = {}
     while queue:
         node, level = queue.popleft()
-        index = column_order.index(node.number)
+        index = node_to_index[node.number]
         if level in level_min_max:
             level_min_max[level] = (min(level_min_max[level][0], index), max(level_min_max[level][1], index))
         else:
@@ -57,30 +147,27 @@ def bfs(root, column_order):
 
 n = int(input())  # Number of nodes
 nodes = {i: Node(i) for i in range(1, n + 1)}
+not_root = set()  # 루트가 될 수 없는 노드의 집합
 
-root = None
 for _ in range(n):
     number, left, right = map(int, input().split())
     if left != -1:
         nodes[number].left = nodes[left]
+        not_root.add(left)
     if right != -1:
         nodes[number].right = nodes[right]
-    if root is None:
-        root = nodes[number]
+        not_root.add(right)
 
-# Find the actual root
-for i in range(1, n + 1):
-    if all(i != child.number for node in nodes.values() for child in [node.left, node.right] if child):
-        root = nodes[i]
-        break
+root_number = (set(nodes.keys()) - not_root).pop()  # 집합 연산을 통해 루트 노드 번호를 찾음
+root = nodes[root_number]
 
-# In-order traversal to get column order
-column_order = [0]  # Start indexing from 1
-in_order_traversal(root, column_order)
-column_order = [0] + column_order  # Adjusting for 1-based indexing
+# In-order traversal to get column order and node-to-index mapping
+column_order = []
+node_to_index = {}
+in_order_traversal(root, column_order, node_to_index)
 
 # BFS to calculate width of each level
-level_min_max = bfs(root, column_order)
+level_min_max = bfs(root, node_to_index)
 
 # Find the level with the maximum width
 max_width = 0
