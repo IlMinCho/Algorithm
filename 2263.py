@@ -9,6 +9,11 @@
 
 # 출력
 # 첫째 줄에 프리오더를 출력한다.
+import sys
+
+# 재귀 깊이 한계를 증가시킵니다.
+sys.setrecursionlimit(10**6)
+
 def construct_preorder(inorder, postorder, in_start, in_end, post_start, post_end, in_map):
     if (in_start > in_end) or (post_start > post_end):
         return []
