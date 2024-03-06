@@ -19,6 +19,7 @@
 
 # 출력
 # 2가지 조건을 만족하는 수의 개수를 출력한다.
+
 from itertools import permutations
 from math import sqrt
 
