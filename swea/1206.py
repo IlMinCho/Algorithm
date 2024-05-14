@@ -34,7 +34,6 @@
 
 # #부호와 함께 테스트케이스의 번호를 출력하고, 공백 문자 후 조망권이 확보된 세대의 수를 출력한다.
 
-
 def count_view_unit(N, heights):
     count = 0
 
@@ -43,8 +42,8 @@ def count_view_unit(N, heights):
         right_max = max(heights[i+1], heights[i+2])
         tallest_adjacent = max(left_max, right_max)
     
-    if heights[i] > tallest_adjacent:
-        count += heights[i] - tallest_adjacent
+        if heights[i] > tallest_adjacent:
+            count += heights[i] - tallest_adjacent
 
     return count
 
@@ -57,8 +56,7 @@ if __name__ == "__main__":
         heights = list(map(int, input().strip().split()))
 
         result = count_view_unit(N, heights)
-        results.append(f"#{t+1} {result}")
+        results.append(f"#{t + 1} {result}")
     
     for result in results:
         print(result)
-
