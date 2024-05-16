@@ -41,7 +41,12 @@ def max_sum_in_grid(grid):
     diag1_sum = sum(grid[i][i] for i in range(size))
     if diag1_sum > max_sum:
         max_sum = diag1_sum
-
+    
+    # 부 대각선의 합 계산
+    diag2_sum = sum(grid[i][size - 1 - i] for i in range(size))
+    if diag2_sum > max_sum:
+        max_sum = diag2_sum
+    
     return max_sum
 
 # 외부 입력 받기
