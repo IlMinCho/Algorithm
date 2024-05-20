@@ -26,10 +26,53 @@
 
 # #부호와 함께 테스트 케이스의 번호를 출력하고, 공백 문자 후 찾은 회문의 길이를 출력한다.
 
-def palindrome(string):
-    n = len(string)
-    for s in range(n // 2):
-        if string[s] != string[n - 1 - s]:
+# def palindrome(string):
+#     n = len(string)
+#     for s in range(n // 2):
+#         if string[s] != string[n - 1 - s]:
+#             return False
+#     return True
+
+# def find_longest_palindrome(arr):
+#     max_length = 1
+
+#     # 가로 방향 회문 검사
+#     for i in range(100):  # 행 번호
+#         for j in range(100):  # 시작 열 번호
+#             for k in range(j + max_length, 101):  # 회문 길이
+#                 word = arr[i][j:k]
+#                 if palindrome(word):
+#                     max_length = max(max_length, k - j)
+
+#     # 세로 방향 회문 검사
+#     for j in range(100):  # 열 번호
+#         for i in range(100):  # 시작 행 번호
+#             for k in range(i + max_length, 101):  # 회문 길이
+#                 word = ''.join(arr[m][j] for m in range(i, k))
+#                 if palindrome(word):
+#                     max_length = max(max_length, k - i)
+
+#     return max_length
+
+# # 입력 받기
+# test_cases = 10
+# results = []
+
+# for tc in range(1, test_cases + 1):
+#     T = int(input().strip())
+#     arr = [input().strip() for _ in range(100)]
+    
+#     result = find_longest_palindrome(arr)
+#     results.append(f"#{T} {result}")
+
+# # 결과 출력하기
+# for result in results:
+#     print(result)
+
+def is_palindrome(s):
+    n = len(s)
+    for i in range(n // 2):
+        if s[i] != s[n - 1 - i]:
             return False
     return True
 
@@ -38,19 +81,18 @@ def find_longest_palindrome(arr):
 
     # 가로 방향 회문 검사
     for i in range(100):  # 행 번호
-        for j in range(100):  # 시작 열 번호
-            for k in range(j + max_length, 101):  # 회문 길이
-                word = arr[i][j:k]
-                if palindrome(word):
-                    max_length = max(max_length, k - j)
+        for start in range(100):  # 시작 열 번호
+            for length in range(max_length, 101 - start):  # 회문 길이
+                if is_palindrome(arr[i][start:start + length]):
+                    max_length = length
 
     # 세로 방향 회문 검사
     for j in range(100):  # 열 번호
-        for i in range(100):  # 시작 행 번호
-            for k in range(i + max_length, 101):  # 회문 길이
-                word = ''.join(arr[m][j] for m in range(i, k))
-                if palindrome(word):
-                    max_length = max(max_length, k - i)
+        for start in range(100):  # 시작 행 번호
+            col_str = ''.join(arr[row][j] for row in range(start, min(start + max_length, 100)))
+            for length in range(max_length, 101 - start):  # 회문 길이
+                if is_palindrome(col_str[start:start + length]):
+                    max_length = length
 
     return max_length
 
