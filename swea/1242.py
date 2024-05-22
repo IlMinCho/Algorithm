@@ -110,155 +110,71 @@
 
 # 따라서 2번의 출력 값은 올바른 암호코드인 18694956의 값만 더한 48이 된다.
 
-# def hex_to_bin(hex_string):
-#     # 16진수 문자열을 2진수 문자열로 변환
-#     return bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)
+def hex_to_bin(hex_string):
+    # 16진수 문자열을 2진수 문자열로 변환
+    return bin(int(hex_string, 16))[2:].zfill(len(hex_string) * 4)
 
-# def decode_password(binary_code):
-#     CODE_MAP = {
-#         "0001101": 0,
-#         "0011001": 1,
-#         "0010011": 2,
-#         "0111101": 3,
-#         "0100011": 4,
-#         "0110001": 5,
-#         "0101111": 6,
-#         "0111011": 7,
-#         "0110111": 8,
-#         "0001011": 9,
-#     }
+def decode_password(binary_code):
+    CODE_MAP = {
+        "0001101": 0,
+        "0011001": 1,
+        "0010011": 2,
+        "0111101": 3,
+        "0100011": 4,
+        "0110001": 5,
+        "0101111": 6,
+        "0111011": 7,
+        "0110111": 8,
+        "0001011": 9,
+    }
     
-#     digits = []
-#     for i in range(0, 56, 7):
-#         segment = binary_code[i:i + 7]
-#         if segment in CODE_MAP:
-#             digits.append(CODE_MAP[segment])
-#         else:
-#             return []
-#     return digits
-
-# def is_valid_password(digits):
-#     if len(digits) != 8:
-#         return False
-    
-#     odd_sum = sum(digits[i] for i in range(0, 8, 2))
-#     even_sum = sum(digits[i] for i in range(1, 8, 2))
-#     check_sum = (odd_sum * 3) + even_sum
-#     return check_sum % 10 == 0
-
-# def process_case():
-#     # 입력 받기
-#     N, M = map(int, input().split())
-#     hex_matrix = [input().strip() for _ in range(N)]
-    
-#     unique_codes = set()
-#     valid_sum = 0
-    
-#     for hex_line in hex_matrix:
-#         binary_line = hex_to_bin(hex_line)
-#         # 암호 코드 부분 찾기 (오른쪽 끝부터 왼쪽으로 검색)
-#         for i in range(len(binary_line) - 1, 55, -1):
-#             if binary_line[i] == '1':
-#                 end = i + 1
-#                 start = end - 56
-#                 if start < 0:
-#                     continue
-#                 code = binary_line[start:end]
-#                 if code not in unique_codes:
-#                     unique_codes.add(code)
-#                     digits = decode_password(code)
-#                     if digits and is_valid_password(digits):
-#                         valid_sum += sum(digits)
-    
-#     return valid_sum
-
-# # 전체 테스트 케이스 처리
-# test_cases = int(input())
-# for tc in range(1, test_cases + 1):
-#     result = process_case()
-#     print(f"#{tc} {result}")
-
-def ten_to_binary(n):  # 10진수를 2진수로 변환
-    ans = ''
-    for i in range(4):  # 4자리
-        ans = str(n % 2) + ans  # 나머지를 왼쪽에 붙여준다.
-        n //= 2
-    return ans
-
-def hex_to_binary(n):
-    ans = ''
-    for c in n:  # 입력받은 16진수 순회
-        if c.isdigit():  # 숫자인 경우
-            ans += ten_to_binary(int(c))
-        else:  # 문자인 경우 딕셔너리 활용
-            ans += ten_to_binary(hex_c[c])
-    return ans
-
-def search_code():  # 메인 함수, 총 암호 해독 값의 합을 찾는다.
-    total = 0
-    for i in range(len(arr)):  # 줄 별로 확인
-        binary_line = hex_to_binary(arr[i])
-        arr[i] = binary_line
-        while '1' in binary_line:  # '1'이 더 이상 없으면 종료
-            e, width = code_status(binary_line)  # 코드의 너비와 끝점을 받아온다.
-            if e == -1:  # 유효한 끝점을 찾지 못한 경우
-                break
-            binary = binary_line[e - 56 * width + 1:e + 1: width]  # 코드 길이로 자르기
-            if binary not in visited:  # 중복된 코드가 있으면 보지 않는다.
-                total += solve_code(binary)
-                visited.add(binary)
-            binary_line = binary_line[:e - 56 * width + 1].rstrip('0')  # 확인한 코드는 제거 후 배열에서 오른쪽 0을 다 지운다.
-    return total
-
-def code_status(line):  # 너비와 끝점 찾는 함수
-    cnt, e = 0, -1  # 암호의 길이와 끝점, 유효하지 않은 끝점은 -1
-    current = '0'  # 암호를 확인하고 값을 저장
-    change = 0  # 네번 바뀌는지 파악하기 위한 변수
-    for j in range(len(line))[::-1]:
-        if current != line[j]:
-            if change == 4:  # 4번 바뀌면 종료
-                break
-            change += 1
-            current = line[j]
-        if line[j] == '1':
-            if cnt == 0:
-                e = j  # 끝 점 기억
-            cnt += 1  # 1 개수 세기
-        if cnt and line[j] == '0':
-            cnt += 1  # 0 개수 세기
-    width = cnt // 7  # 7의 몇 배수인지 파악
-    if cnt % 7 != 0:  # 암호 코드가 7의 배수가 아닌 경우 무효 처리
-        return -1, -1
-    return e, width  # 끝점과 너비
-
-def solve_code(code):  # 암호 시작점을 받아 해독한다.
-    result = []  # 시작부분에 padding을 넣어준다.
-    for i in range(8):  # 딕셔너리에 적은 코드와 같으면 그 값인 숫자로 넣어준다.
-        segment = code[i * 7:(i + 1) * 7]
-        if segment in d:
-            result.append(d[segment])
+    digits = []
+    for i in range(0, 56, 7):
+        segment = binary_code[i:i + 7]
+        if segment in CODE_MAP:
+            digits.append(CODE_MAP[segment])
         else:
-            return 0  # 유효하지 않은 코드
-    odd_sum, even_sum = 0, 0
-    for i in range(8):
-        if i % 2 == 0:  # 홀수 인덱스 (1-based)
-            odd_sum += result[i]
-        else:  # 짝수 인덱스 (1-based)
-            even_sum += result[i]
+            return []
+    return digits
 
-    if (odd_sum * 3 + even_sum) % 10 == 0:  # 계산 후 10으로 나누어 떨어지는지 판별
-        return sum(result)
-    else:
-        return 0
+def is_valid_password(digits):
+    if len(digits) != 8:
+        return False
+    
+    odd_sum = sum(digits[i] for i in range(0, 8, 2))
+    even_sum = sum(digits[i] for i in range(1, 8, 2))
+    check_sum = (odd_sum * 3) + even_sum
+    return check_sum % 10 == 0
 
-d = {
-    '0001101': 0, '0011001': 1, '0010011': 2, '0111101': 3, '0100011': 4,
-    '0110001': 5, '0101111': 6, '0111011': 7, '0110111': 8, '0001011': 9
-}
-hex_c = {'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15}
+def process_case():
+    # 입력 받기
+    N, M = map(int, input().split())
+    hex_matrix = [input().strip() for _ in range(N)]
+    
+    unique_codes = set()
+    valid_sum = 0
+    
+    for hex_line in hex_matrix:
+        binary_line = hex_to_bin(hex_line)
+        # 암호 코드 부분 찾기 (오른쪽 끝부터 왼쪽으로 검색)
+        for i in range(len(binary_line) - 1, 55, -1):
+            if binary_line[i] == '1':
+                end = i + 1
+                start = end - 56
+                if start < 0:
+                    continue
+                code = binary_line[start:end]
+                if code not in unique_codes:
+                    unique_codes.add(code)
+                    digits = decode_password(code)
+                    if digits and is_valid_password(digits):
+                        valid_sum += sum(digits)
+    
+    return valid_sum
 
-for tc in range(1, 1 + int(input())):
-    n, m = map(int, input().split())
-    arr = list(set([input().strip().rstrip('0') for _ in range(n)]))  # 오른쪽에 0 제거, set로 중복제거한 후 다시 리스트에 담는다.
-    visited = set()  # 중복된 코드가 있는지 확인
-    print(f'#{tc} {search_code()}')
+# 전체 테스트 케이스 처리
+test_cases = int(input())
+for tc in range(1, test_cases + 1):
+    result = process_case()
+    print(f"#{tc} {result}")
+
