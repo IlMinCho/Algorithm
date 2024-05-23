@@ -40,27 +40,38 @@
 
 # 같은 줄에 빈 칸을 하나 사이에 두고 교환 후 받을 수 있는 가장 큰 금액을 출력한다.
 
+from collections import deque
 
 def find_max_prize(board, swaps):
-    def dfs(depth, current_board):
-        if depth == 0:
-            return int("".join(current_board))
+    initial_state = (board, swaps)
+    queue = deque([initial_state])
+    visited = set()
+    visited.add((board, swaps))
+    max_value = 0
+
+    while queue:
+        current_board, current_swaps = queue.popleft()
+        if current_swaps == 0:
+            max_value = max(max_value, int(current_board))
+            continue
         
-        max_value = 0
-        length = len(current_board)
-        
+        board_list = list(current_board)
+        length = len(board_list)
         for i in range(length):
             for j in range(i + 1, length):
                 # Swap i and j
-                current_board[i], current_board[j] = current_board[j], current_board[i]
-                max_value = max(max_value, dfs(depth - 1, current_board))
+                board_list[i], board_list[j] = board_list[j], board_list[i]
+                next_board = ''.join(board_list)
+                next_state = (next_board, current_swaps - 1)
+                
+                if next_state not in visited:
+                    visited.add(next_state)
+                    queue.append(next_state)
+                
                 # Swap back to restore the original state
-                current_board[i], current_board[j] = current_board[j], current_board[i]
-        
-        return max_value
+                board_list[i], board_list[j] = board_list[j], board_list[i]
 
-    board_list = list(board)
-    return dfs(swaps, board_list)
+    return max_value
 
 # 입력
 test_cases = int(input())
