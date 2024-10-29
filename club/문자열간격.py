@@ -22,6 +22,8 @@
 #     diff = right_idx - left_idx -2
 
 #     return diff
+# set 사용해서 중복체크 못함
+
 
 from collections import Counter
 
@@ -60,7 +62,7 @@ print(programmerStrings('progxrammerrxproxgrammer'))
 print(programmerStrings('programmerprogrammer'))
 
 
-print(programmerStrings('programxxxxxxmexxxxrxxxprozmerqgram'))
+print(programmerStrings('programxxxxxxxxxxxxxxxmexxxxrxxxprozmerqgram'))
 print(programmerStrings('0'))
 
 
