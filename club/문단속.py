@@ -11,12 +11,14 @@ valid = True
 
 while i < len(list_door):
     door = list_door[i]
+    #추가
     if door >= 0:
         opened_doors.add(door)
         stack.append(door)
     else:
-        # 스택의 마지막 문이 아니면 오류
+        #빼기
         if -door in opened_doors:
+            # 스택의 마지막 문이 아니면 오류
             if stack[-1] != -door:
                 valid = False
                 break
