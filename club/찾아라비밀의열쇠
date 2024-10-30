@@ -1,0 +1,16 @@
+# 최소 c이상의 문, N 열쇠, 열쇠갯수 K
+# 문 열수있는 열쇠에 포함된 번호
+# 가지고 있는 열쇠에 포함된 번호
+
+N, K, C = map(int, input().split())
+open_keys = set(map(int, input().split()))
+has_keys = set(map(int, input().split()))
+
+intersection_keys = open_keys & has_keys
+print(intersection_keys)
+
+if len(intersection_keys) >= C:
+    print('yes') 
+else:
+    print('no')
+

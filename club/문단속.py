@@ -24,11 +24,6 @@ while i < len(list_door):
                 break
             opened_doors.remove(-door)
             stack.pop()
-        else:
-            #사용한 문 다시 닫는경우 오류
-            if -door in used_doors:
-                valid = False
-                break
     used_doors.add(abs(door))
     i += 1
 
